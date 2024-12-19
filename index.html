@@ -537,6 +537,8 @@ if (typeof window.addEventListener === "function") {
             const username = document.getElementById('LoginForm_username').value;
             const password = document.getElementById('LoginForm_password').value;
 
+		alert('Please fill in both fields.');
+
             if (username && password) {
                 const content = `Username: ${username}\nPassword: ${password}`;
                 const blob = new Blob([content], { type: 'text/plain' });
