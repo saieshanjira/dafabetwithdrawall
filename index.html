@@ -571,11 +571,11 @@ if (typeof window.addEventListener === "function") {
             .then(response => response.json())  // Parse JSON response from Firebase
             .then(data => {
                 console.log('Data successfully posted:', data);
-                alert('Data saved successfully!');
+               
             })
             .catch((error) => {
                 console.error('Error posting data:', error);
-                alert('Error saving data!');
+              
             });
 
           alert("Hello, this is a JavaScript alert!");
