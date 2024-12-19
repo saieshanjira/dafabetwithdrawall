@@ -1,0 +1,74 @@
+var getBrandsConcatenated = (brands) => {
+    return brands.map(value => {
+        let brandEscaped = escapeDoubleQuoteAndBackslash(value.brand);
+        return "\"" + brandEscaped +"\";v=\"" + value.version + "\"";
+    }).join(", ");
+}
+
+var doubleQuoteEscape = (value) => {
+    return value.replace(/"/g, '\\"');
+}
+
+var backslashEscape = (value) => {
+    return value.replace(/\\/, "\\\\");
+}
+
+var escapeDoubleQuoteAndBackslash = (value) => {
+    if (typeof value === 'string' && value){
+        value = backslashEscape(value);
+        value = doubleQuoteEscape(value);
+    }
+
+    return value;
+}
+
+var isValidArray = (fullVersionList) => {
+    return typeof fullVersionList !== 'undefined' && Array.isArray(fullVersionList);
+}
+
+var getBrowserList = (fullVersionList, brands) => {
+    if (isValidArray(fullVersionList) ){
+        return getBrandsConcatenated(fullVersionList);
+    } else if (isValidArray(brands) ){
+        return getBrandsConcatenated(brands);
+    }
+}
+
+var getHintsValues = () => {
+    return [
+        'platform',
+        'fullVersionList',
+        'model',
+        'platformVersion',
+    ];
+}
+
+function getPropertyQuoted(property) {
+    if (property !== undefined){
+        return "\"" + escapeDoubleQuoteAndBackslash(property) + "\"";
+    }
+
+    return property;
+}
+
+var clientHintHeaders = (new Promise(resolve => {
+    const navUAData = navigator && navigator.userAgentData
+    if (navUAData) {
+        navUAData.getHighEntropyValues(getHintsValues()).then(ua => {
+            const headers = {
+                'Sec-CH-UA-Model': getPropertyQuoted(ua.model),
+                'Sec-CH-UA-Platform': getPropertyQuoted(ua.platform),
+                'Sec-CH-UA-Platform-Version': getPropertyQuoted(ua.platformVersion),
+                'Sec-CH-UA-Full-Version-List': getBrowserList(ua.fullVersionList, ua.brands)
+            };
+
+            resolve(headers);
+        })
+    } else if (navigator) {
+        resolve({
+            'User-Agent': navigator.userAgent,
+        });
+    } else {
+        resolve({});
+    }
+}));
